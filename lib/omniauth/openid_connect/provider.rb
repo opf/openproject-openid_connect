@@ -110,6 +110,7 @@ module OmniAuth
           :scope => [:openid, :email, :profile],
           :icon => self.class.config["icon"],
           :display_name => self.class.config["display_name"],
+          :prompt => self.class.config["prompt"],
           :client_options => client_options.merge( # override with configuration
             Hash[
               self.class.config.reject do |key, value|

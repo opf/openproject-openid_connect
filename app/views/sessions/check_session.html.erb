@@ -1,0 +1,63 @@
+<div>
+  <script src="/assets/jquery/dist/jquery.js?body=1"></script>
+  <script type="text/javascript">
+    var client_id = "foobar";
+    var stat = "unchanged";
+
+    var sessionState = function() {
+      var state = undefined;
+      var setState = function(sessionState) {
+        state = sessionState;
+      };
+
+      jQuery.ajax({
+        url: "http://localhost:3001/auth/session_state",
+        success: setState,
+        async: false
+      });
+
+      return state;
+    }
+
+    var message = function() {
+      return client_id + " " + sessionState();
+    }
+
+    var checkSession = function() {
+      var targetOrigin  = "http://localhost:3000"; // URL to Concierge
+      var win = window.parent.document.getElementById("openid_connect_provider").contentWindow;
+
+      if (sessionState() !== undefined) {
+        win.postMessage(message(), targetOrigin);
+      }
+    }
+
+    var setTimer = function() {
+      checkSession();
+      timerID = setInterval(checkSession, 3 * 1000);
+    }
+
+    var receiveMessage = function(e) {
+      var targetOrigin  = "http://localhost:3000"; // URL to Concierge
+
+      if (e.origin !== targetOrigin ) {
+        return;
+      }
+
+      stat = e.data;
+
+      if (stat == "changed") {
+        // document.getElementById('rp-info').innerHTML = 'state changed'
+        // user was logged out in concierge (perhaps logged in as someone else) - so log him out here too
+        window.top.location.href = "http://localhost:3001/logout";
+      } else {
+        document.getElementById('rp-info').innerHTML = 'state unchanged'
+      }
+    }
+
+    window.addEventListener("message", receiveMessage, false);
+
+    setTimer();
+  </script>
+  <p style="color: white;">RP: <span id="rp-info"></span></p>
+</div>

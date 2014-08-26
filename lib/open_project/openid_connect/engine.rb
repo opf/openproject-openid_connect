@@ -16,6 +16,10 @@ module OpenProject::OpenIDConnect
       openid_connect/auth_provider-google.png
     )
 
+    config.to_prepare do
+      require_dependency 'open_project/openid_connect/hooks'
+    end
+
     register_auth_providers do
       # Loading OpenID providers manually since rails doesn't do it automatically,
       # possibly due to non trivially module-name-convertible paths.
@@ -34,7 +38,14 @@ module OpenProject::OpenIDConnect
 
       strategy :openid_connect do
         OmniAuth::OpenIDConnect::Provider.load_generic_providers
-        OmniAuth::OpenIDConnect::Provider.available.map { |p| p.new.to_hash }
+        OmniAuth::OpenIDConnect::Provider.available.map do |p|
+          OpenProject::OmniAuth::Authorization.after_login provider: p.provider_name do |user, auth_hash, session|
+            session[:oidc_state] = auth_hash.extra.raw_info.sub
+            puts "fix this callback issue"
+          end
+
+          p.new.to_hash
+        end
       end
     end
   end
