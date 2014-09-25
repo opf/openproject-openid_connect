@@ -105,32 +105,26 @@ module OmniAuth
       end
 
       def options
-        {
-          :name => name,
-          :scope => [:openid, :email, :profile],
-          :icon => self.class.config["icon"],
-          :display_name => self.class.config["display_name"],
-          :client_options => client_options.merge( # override with configuration
-            Hash[
-              self.class.config.reject do |key, value|
-                ["identifier", "secret", "icon", "display_name"].include? key
-              end.map do |key, value|
-                [key.to_sym, value]
-              end
-            ]
-          )
-        }
+        allowed_keys = self.class.default_options.keys - ['client_options']
+
+        merge_with_config(
+          allowed_keys,
+          name:           name,
+          scope:          [:openid, :email, :profile],
+          icon:           self.class.config['icon'],
+          display_name:   self.class.config['display_name'],
+          client_options: client_options)
       end
 
       def client_options
-        {
-          :port => 443,
-          :scheme => "https",
-          :host => host,
-          :identifier => identifier,
-          :secret => secret,
-          :redirect_uri => redirect_uri
-        }
+        allowed_keys = self.class.default_options.client_options.keys
+
+        merge_with_config(
+          allowed_keys,
+          port:         443,
+          scheme:       'https'q,
+          host:         host,
+          redirect_uri: redirect_uri)
       end
 
       def host
@@ -173,6 +167,18 @@ module OmniAuth
               in form of a hash analog to the yaml configuration shown above.
         MSG
         raise ArgumentError, msg.strip
+      end
+
+      def merge_with_config(allowed_keys, options)
+        options.merge(
+          Hash[
+            self.class.config.select do |key, _|
+              allowed_keys.include? key
+            end.map do |key, value|
+              [key.to_sym, value]
+            end
+          ]
+        )
       end
     end
   end
