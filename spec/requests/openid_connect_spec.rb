@@ -26,12 +26,7 @@
 # See doc/COPYRIGHT.rdoc for more details.
 #++
 
-require 'spec_helper'
-require_relative 'openid_connect_spec_helpers'
-
-RSpec.configure do |c|
-  c.include OpenIDConnectSpecHelpers
-end
+require_relative '../spec_helper'
 
 describe "OpenID Connect" do
   let(:host) { OmniAuth::OpenIDConnect::Heroku.new('foo', {}).host }

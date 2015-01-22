@@ -1,4 +1,6 @@
-module OpenIDConnectSpecHelpers
+require 'spec_helper'
+
+module OpenProject::OpenIDConnect::SpecHelpers
   def redirect_from_provider(name = 'heroku')
     # Emulate the provider's redirect with a nonsense code.
     get "/auth/#{name}/callback",
@@ -10,4 +12,8 @@ module OpenIDConnectSpecHelpers
     # Emulate click on sign-in for that particular provider
     get "/auth/#{pro_name}"
   end
+end
+
+RSpec.configure do |config|
+  config.include OpenProject::OpenIDConnect::SpecHelpers
 end
