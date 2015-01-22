@@ -16,4 +16,9 @@ end
 
 RSpec.configure do |config|
   config.include OpenProject::OpenIDConnect::SpecHelpers
+
+  config.before(:each) do
+    allow(OpenProject::OmniAuth::Authorization).to receive(:callbacks).and_call_original
+    allow(OpenProject::OmniAuth::Authorization).to receive(:after_login_callbacks).and_call_original
+  end
 end
