@@ -61,6 +61,7 @@ describe "OpenID Connect" do
     # enable storing the access token in a cookie
     OpenProject::Configuration['omniauth_store_access_token_in_cookie'] = true
 
+    expect(Rails.env).to eq 'test'
     expect(::Multitenancy::Engine.enabled?).to eq false
   end
 
