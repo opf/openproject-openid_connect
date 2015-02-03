@@ -60,6 +60,9 @@ describe "OpenID Connect" do
 
     # enable storing the access token in a cookie
     OpenProject::Configuration['omniauth_store_access_token_in_cookie'] = true
+
+    puts "Rails.env: #{Rails.env}"
+    puts "Multitenancy engine enabled? #{::Multitenancy::Engine.enabled?}"
   end
 
   describe "sign-up and login" do
